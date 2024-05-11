@@ -1,0 +1,32 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "data-generation"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+dependencies = ["pyarrow", "typer"]
+
+[project.optional-dependencies]
+dev = ["pytest >= 7.2", "ipython", "ruff"]
+spark = ["pyspark >= 3.5"]
+pandas = ["pandas"]
+repl = ["ipython", "jupyterlab"]
+docs = ["mkdocs"]
+
+[project.scripts]
+generator = "data_generation:entry_point"
+
+[tool.ruff]
+line-length = 120
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "python"
+module-name = "data_generation.native"

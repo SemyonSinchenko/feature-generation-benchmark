@@ -1,0 +1,14 @@
+[package]
+name = "data-generation"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "data_generation"
+crate-type = ["cdylib"]
+
+[dependencies]
+arrow = { version = "51.0.0", features = ["pyarrow", "rand"] }
+pyo3 = { version = "0.20.0", features = ["extension-module"] }
+rand = "0.8.5"
+rand_chacha = "0.3.1"
