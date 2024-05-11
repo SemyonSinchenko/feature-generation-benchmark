@@ -15,6 +15,7 @@ BINOMIAL_P = 0.25
 
 
 class DatasetSizes(StrEnum):
+    TINY = auto()
     SMALL = auto()
     MEDIUM = auto()
     BIG = auto()
@@ -24,15 +25,15 @@ def main_function(
     prefix: Annotated[str, typer.Option(help="Output files prefix")],
     size: Annotated[
         DatasetSizes,
-        typer.Option(help="Size of the dataset: 1K, 100K or 100M of customers, default is small"),
-    ] = DatasetSizes.SMALL,
+        typer.Option(help="Size of the dataset: 1K, 10K, 100K or 100M of customers, default is tiny"),
+    ] = DatasetSizes.TINY,
     seed: Annotated[int, typer.Option(help="Random seed value, default is 42")] = 42,
 ) -> None:
     dim = -1
     partitions = -1
     days_in_partition = -1
 
-    if size == DatasetSizes.SMALL:
+    if size == DatasetSizes.TINY:
         # For that case we have:
         # 1000 customers
         # one partition is ~4 months
@@ -40,6 +41,14 @@ def main_function(
         dim = 1e3
         partitions = 6
         days_in_partition = 120
+    elif size == DatasetSizes.SMALL:
+        # For that case we have:
+        # 10_000 customers
+        # one partition is ~2 months
+        # amount of partitions is 12 (~2 years)
+        dim = 1e4
+        partitions = 12
+        days_in_partition = 60
     elif size == DatasetSizes.MEDIUM:
         # For that case we have:
         # 100_000 customers
