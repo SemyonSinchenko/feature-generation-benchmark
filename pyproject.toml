@@ -19,6 +19,7 @@ spark = ["pyspark >= 3.5"]
 pandas = ["pandas"]
 repl = ["ipython", "jupyterlab"]
 docs = ["mkdocs"]
+all = ["data_generation[dev,spark,pandas,repl,docs]"]
 
 [project.scripts]
 generator = "data_generation:entry_point"

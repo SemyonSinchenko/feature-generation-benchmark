@@ -35,8 +35,9 @@ WINDOWS_IN_DAYS = (
     21,  # three weeks
     30,  # month
     90,  # three months
-    180,  # half of the year
-    360,  # two years
+    180, # half of the year
+    360, # year
+    720, # two years
 )
 
 # Information for result
@@ -59,10 +60,22 @@ def get_all_aggregations(col_prefix: str, cond: Column, cols_list: list[Column])
 
 if __name__ == "__main__":
     path = sys.argv[1]
+    json_results_out_file = None
+
+    if "tiny" in path:
+        json_results_out_file = "results_tiny.json"
+    elif "small" in path:
+        json_results_out_file = "results_small.json"
+    elif "medium" in path:
+        json_results_out_file = "results_medium.json"
+    else:
+        json_results_out_file = "results_big.json"
+
     shutil.rmtree("tmp_out", ignore_errors=True)
 
     # Before we go we save the information for the case of OOM
-    json_results = Path(__file__).parent.parent.joinpath("results").joinpath("results.json")
+    assert json_results_out_file is not None
+    json_results = Path(__file__).parent.parent.joinpath("results").joinpath(json_results_out_file)
 
     if json_results.exists():
         results_dict = json.load(json_results.open("r"))
@@ -142,7 +155,6 @@ if __name__ == "__main__":
 
     # Write results
     print("[italic green]Dump results to JSON...[/italic green]")
-    json_results = Path(__file__).parent.parent.joinpath("results").joinpath("results.json")
     if json_results.exists():
         results_dict = json.load(json_results.open("r"))
     else:

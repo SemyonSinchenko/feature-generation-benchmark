@@ -1,0 +1,12 @@
+{
+ "Pandas": {
+  "dataset": "test_data_tiny",
+  "approach": "Pivot",
+  "total_time": 13.047019004821777
+ },
+ "PySpark": {
+  "dataset": "test_data_tiny",
+  "approach": "Case-When",
+  "total_time": 289.074431180954
+ }
+}

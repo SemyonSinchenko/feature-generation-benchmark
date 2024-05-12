@@ -35,8 +35,9 @@ WINDOWS_IN_DAYS = (
     21,  # three weeks
     30,  # month
     90,  # three months
-    180,  # half of the year
-    360,  # two years
+    180, # half of the year
+    360, # year
+    720, # two years
 )
 
 
@@ -62,10 +63,21 @@ def generate_pivoted_batch(data: pd.DataFrame, t_minus: int, groups: list[str]) 
 
 if __name__ == "__main__":
     path = sys.argv[1]
+    json_results_out_file = None
+
+    if "tiny" in path:
+        json_results_out_file = "results_tiny.json"
+    elif "small" in path:
+        json_results_out_file = "results_small.json"
+    elif "medium" in path:
+        json_results_out_file = "results_medium.json"
+    else:
+        json_results_out_file = "results_big.json"
+
     shutil.rmtree("tmp_out", ignore_errors=True)
 
     # Before we go we save the information for the case of OOM
-    json_results = Path(__file__).parent.parent.joinpath("results").joinpath("results.json")
+    json_results = Path(__file__).parent.parent.joinpath("results").joinpath(json_results_out_file)
 
     if json_results.exists():
         results_dict = json.load(json_results.open("r"))
@@ -75,7 +87,7 @@ if __name__ == "__main__":
     results_dict[ENGINE_NAME] = {
         "dataset": path,
         "approach": APPROACH_NAME,
-        "total_time": -1, # Indicator of OOM/Error; we will overwrite it in the case of success
+        "total_time": -1,  # Indicator of OOM/Error; we will overwrite it in the case of success
     }
 
     with json_results.open("w") as file_:
