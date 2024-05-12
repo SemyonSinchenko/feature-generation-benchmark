@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arrow::{
     array::{
         make_array, Array, ArrayData, ArrayIter, Float64Array, Int64Array, RecordBatch, StringArray,
@@ -8,11 +6,13 @@ use arrow::{
     pyarrow::PyArrowType,
 };
 use pyo3::{exceptions::PyRuntimeError, prelude::*};
+use rand::seq::SliceRandom;
 use rand::{
-    distributions::{Distribution, Standard, Uniform},
     Rng, SeedableRng,
 };
+use rand::distributions::{Distribution, Standard, Uniform};
 use rand_chacha::ChaCha8Rng;
+use std::sync::Arc;
 
 /// Parameters of transactions amount distribution
 const MIN: f64 = 100.0;
@@ -30,7 +30,7 @@ const CARD_TYPES: (&str, &str) = ("DC", "CC");
 /// We have different transactions categories
 /// We will choose them uniformly
 /// Inspired by: https://medium.com/@swedbank.tech/how-does-categorization-of-transactions-work-4262d720fd2d
-const TRANSACTION_TYPES: [&'static str; 13] = [
+const TRANSACTION_TYPES: [&str; 13] = [
     "food-and-household",
     "home",
     "uncategorized",
@@ -50,38 +50,42 @@ const TRANSACTION_TYPES: [&'static str; 13] = [
 /// We will choose mobile with probability 0.25 classic otherwise
 const CHANNELS: (&str, &str) = ("mobile", "web");
 
+
+/// Result of intermediate generation
+struct TransactionsResult {
+    customer_id: Vec<i64>,
+    card_type: Vec<&'static str>,
+    trx_type: Vec<&'static str>,
+    channel: Vec<&'static str>,
+    trx_amnt: Vec<f64>,
+    t_minus: Vec<i64>,
+}
+
 /// Generate data for a single customer;
 /// Returns expected_amnt of rows in a fixed schema.
 fn generate_customer_transactions(
     id: i64,
     expected_amnt: i64,
     distr_trx: Uniform<f64>,
-    distr_cat: Uniform<i64>,
     seed: u64,
     d_minus: i64,
-) -> (
-    Vec<i64>,
-    Vec<&'static str>,
-    Vec<&'static str>,
-    Vec<&'static str>,
-    Vec<f64>,
-    Vec<i64>,
-) {
+) -> TransactionsResult {
     let mut rng = ChaCha8Rng::seed_from_u64(seed);
 
     // We will sample from expected amount;
     // Interval is defined on the top of the file
-    let distr_90p = Uniform::<i64>::try_from((expected_amnt * BOTTOM / 100)..(expected_amnt * UPPER / 100)).unwrap();
-    let sampled_expected = distr_90p.sample(&mut rng);
+    let distr_90p =
+        Uniform::<i64>::try_from((expected_amnt * BOTTOM / 100)..(expected_amnt * UPPER / 100))
+            .unwrap();
+    let sampled_expected = distr_90p.sample(&mut rng).as_usize();
 
     // I will store rows as columns in form of vectors
-    let ids: Vec<i64> = vec![id; sampled_expected.as_usize()];
-    let mut card_t: Vec<&'static str> = Vec::with_capacity(sampled_expected.as_usize());
-    let mut trx_t: Vec<&'static str> = Vec::with_capacity(sampled_expected.as_usize());
-    let mut ch_t: Vec<&'static str> = Vec::with_capacity(sampled_expected.as_usize());
-    let mut amnt: Vec<f64> = Vec::with_capacity(sampled_expected.as_usize());
-    let t_minus: Vec<i64> = vec![d_minus; sampled_expected.as_usize()];
-
+    let ids: Vec<i64> = vec![id; sampled_expected];
+    let mut card_t: Vec<&'static str> = Vec::with_capacity(sampled_expected);
+    let mut trx_t: Vec<&'static str> = Vec::with_capacity(sampled_expected);
+    let mut ch_t: Vec<&'static str> = Vec::with_capacity(sampled_expected);
+    let mut amnt: Vec<f64> = Vec::with_capacity(sampled_expected);
+    let t_minus: Vec<i64> = vec![d_minus; sampled_expected];
 
     for _i in 0..sampled_expected {
         // Choose DC with probability 75%
@@ -92,9 +96,7 @@ fn generate_customer_transactions(
         };
 
         // Choose random transaction type
-        let trx_type = TRANSACTION_TYPES
-            .get(distr_cat.sample(&mut rng).as_usize())
-            .unwrap();
+        let trx_type = TRANSACTION_TYPES.choose(&mut rng).unwrap();
 
         // Choose mobile channel with probability 25%
         let channel_type = if rng.gen_bool(0.25) {
@@ -112,7 +114,14 @@ fn generate_customer_transactions(
         amnt.push(trx_amnt);
     }
 
-    (ids, card_t, trx_t, ch_t, amnt, t_minus)
+    TransactionsResult {
+        customer_id: ids,
+        card_type: card_t,
+        trx_type: trx_t,
+        channel: ch_t,
+        trx_amnt: amnt,
+        t_minus,
+    }
 }
 
 /// Generate batch of random seeded transactions for the given customers list considering expected amount of transactions
@@ -130,15 +139,9 @@ fn generate_data_batch(
     let dim = ids_arr.len() * days_in_batch.as_usize();
 
     let trx_amnt_distr = Uniform::<f64>::try_from(MIN..MAX).unwrap();
-    let trx_cat_distr = Uniform::<i64>::try_from(0..12).unwrap();
 
     // I will store generated batches as vector of vectors
-    let mut ids_out_col: Vec<Vec<i64>> = Vec::with_capacity(dim);
-    let mut card_type_out_col: Vec<Vec<&str>> = Vec::with_capacity(dim);
-    let mut trx_type_out_col: Vec<Vec<&str>> = Vec::with_capacity(dim);
-    let mut channel_out_col: Vec<Vec<&str>> = Vec::with_capacity(dim);
-    let mut trx_amnt_out_col: Vec<Vec<f64>> = Vec::with_capacity(dim);
-    let mut t_minus_out_col: Vec<Vec<i64>> = Vec::with_capacity(dim);
+    let mut results_of_generation: Vec<TransactionsResult> = Vec::with_capacity(dim);
 
     // This generator is used for generating of u64 seeds for mini-batch generation
     let mut global_rnd = ChaCha8Rng::seed_from_u64(global_seed);
@@ -169,77 +172,67 @@ fn generate_data_batch(
                 id.unwrap(),
                 expected.unwrap(),
                 trx_amnt_distr,
-                trx_cat_distr,
                 global_rnd.sample(Standard),
                 local_offset,
             );
-
-            ids_out_col.push(generated_part.0);
-            card_type_out_col.push(generated_part.1);
-            trx_type_out_col.push(generated_part.2);
-            channel_out_col.push(generated_part.3);
-            trx_amnt_out_col.push(generated_part.4);
-            t_minus_out_col.push(generated_part.5);
-            local_offset += 1;
+            results_of_generation.push(generated_part)
         }
     }
-
 
     // Our intermediate results are in form Vec<Vec<T>>;
     // But we need them in form of Arrow structures.
     // I do the following:
     // 1. flatten vec
     // 2. *x to convert from &T to T
-    // 3. try_from constructor of arrow arrays
-    // 4. unwrap in the end because I know that data is valid
-    let ids_res: Int64Array = Int64Array::try_from(
-        ids_out_col
+    // 3. invoke from constructor of arrow arrays
+    let ids_res: Int64Array = Int64Array::from(
+        results_of_generation
             .iter()
+            .map(|x| x.customer_id.iter())
             .flatten()
             .map(|x| *x)
             .collect::<Vec<i64>>(),
-    )
-    .unwrap();
-    let card_t_res = StringArray::try_from(
-        card_type_out_col
+    );
+    let card_t_res = StringArray::from(
+        results_of_generation
             .iter()
+            .map(|x| x.card_type.iter())
             .flatten()
             .map(|x| *x)
             .collect::<Vec<&str>>(),
-    )
-    .unwrap();
-    let trx_t_res = StringArray::try_from(
-        trx_type_out_col
+    );
+    let trx_t_res = StringArray::from(
+        results_of_generation
             .iter()
+            .map(|x| x.trx_type.iter())
             .flatten()
             .map(|x| *x)
             .collect::<Vec<&str>>(),
-    )
-    .unwrap();
-    let ch_t_res = StringArray::try_from(
-        channel_out_col
+    );
+    let ch_t_res = StringArray::from(
+        results_of_generation
             .iter()
+            .map(|x| x.channel.iter())
             .flatten()
             .map(|x| *x)
             .collect::<Vec<&str>>(),
-    )
-    .unwrap();
-    let trx_res = Float64Array::try_from(
-        trx_amnt_out_col
+    );
+    let trx_res = Float64Array::from(
+        results_of_generation
             .iter()
+            .map(|x| x.trx_amnt.iter())
             .flatten()
             .map(|x| *x)
             .collect::<Vec<f64>>(),
-    )
-    .unwrap();
-    let t_minus_res = Int64Array::try_from(
-        t_minus_out_col
+    );
+    let t_minus_res = Int64Array::from(
+        results_of_generation
             .iter()
+            .map(|x| x.t_minus.iter())
             .flatten()
             .map(|x| *x)
             .collect::<Vec<i64>>(),
-    )
-    .unwrap();
+    );
 
     // Partition column is a constant; may it be done more efficiently?
     let part_col = StringArray::try_from(vec![partition_name; t_minus_res.len()]).unwrap();

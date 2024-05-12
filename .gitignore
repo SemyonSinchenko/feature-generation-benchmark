@@ -460,6 +460,8 @@ spark-warehouse/
 
 
 # Generated datasets
-test_data_small
-test_data_medium
-test_data_big
+test_data_*
+tmp_out*
+
+# Rust things
+.so
