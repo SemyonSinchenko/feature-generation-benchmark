@@ -41,7 +41,7 @@ WINDOWS_IN_DAYS = (
 
 
 # Information for result
-ENGINE_NAME = "Duckdb"
+ENGINE_NAME = "DuckDB"
 APPROACH_NAME = "Case-When"
 
 
@@ -70,6 +70,7 @@ if __name__ == "__main__":
         json_results_out_file = "results_big.json"
 
     shutil.rmtree("tmp_out", ignore_errors=True)
+    shutil.rmtree("tmp_spill", ignore_errors=True)
 
     # Before we go we save the information for the case of OOM
     json_results = Path(__file__).parent.parent.joinpath("results").joinpath(json_results_out_file)
