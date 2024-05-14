@@ -19,8 +19,8 @@ jobs:
 
       - uses: PyO3/maturin-action@v1
         with:
-          command: build
-          args: --release
+          command: develop
+          args: -E all
 
       # Inspired by https://blog.elmah.io/deploying-a-mkdocs-documentation-site-with-github-actions/
       - name: Install & deploy
