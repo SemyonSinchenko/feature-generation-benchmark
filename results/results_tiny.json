@@ -4,5 +4,5 @@
   "Pandas pivot": 35.2749810218811,
   "Polars pivot": 11.391130208969116,
   "DuckDB pivot": 9.10414457321167,
-  "DuckDB case-when": -1
+  "DuckDB case-when": 78.61517810821533
 }
