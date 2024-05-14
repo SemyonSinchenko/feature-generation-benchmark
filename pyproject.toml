@@ -18,9 +18,10 @@ dev = ["pytest >= 7.2", "ipython", "ruff"]
 spark = ["pyspark >= 3.5"]
 pandas = ["pandas"]
 polars = ["polars"]
+duckdb = ["duckdb"]
 repl = ["ipython", "jupyterlab"]
 docs = ["mkdocs"]
-all = ["data_generation[dev,spark,pandas,polars,repl,docs]"]
+all = ["data_generation[dev,spark,pandas,polars,duckdb,repl,docs]"]
 
 [project.scripts]
 generator = "data_generation:entry_point"
