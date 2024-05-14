@@ -5,6 +5,7 @@ import jinja2
 
 RESULTS_TINY = "results_tiny.json"
 RESULTS_SMALL = "results_small.json"
+RESULTS_MEDIUM = "results_medium.json"
 
 
 if __name__ == "__main__":
@@ -15,6 +16,7 @@ if __name__ == "__main__":
 
     results_tiny = json.load(proj_root.joinpath("results").joinpath(RESULTS_TINY).open("r"))
     results_small = json.load(proj_root.joinpath("results").joinpath(RESULTS_SMALL).open("r"))
+    results_medium = json.load(proj_root.joinpath("results").joinpath(RESULTS_MEDIUM).open("r"))
 
     for key in results_tiny:
         if results_tiny[key]["total_time"] == -1:
@@ -28,6 +30,16 @@ if __name__ == "__main__":
         else:
             results_small[key]["total_time"] = f"{results_small[key]['total_time']:.2f}"
 
+    for key in results_medium:
+        if results_medium[key]["total_time"] == -1:
+            results_medium[key]["total_time"] = "OOM"
+        else:
+            results_medium[key]["total_time"] = f"{results_medium[key]['total_time']:.2f}"
+
     with proj_root.joinpath("docs").joinpath("benchmark_results.md").open("w") as file_:
-        filled = template.render(results_tiny=results_tiny, results_small=results_small)
+        filled = template.render(
+            results_tiny=results_tiny,
+            results_small=results_small,
+            results_medium=results_medium,
+        )
         file_.write(filled)

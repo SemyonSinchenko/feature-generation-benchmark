@@ -1,8 +1,19 @@
 # Feature Generation Benchmark
 
+![results](./docs/static/results_overview.png)
+
+[Detailed Results of the Benchmark](https://semyonsinchenko.github.io/feature-generation-benchmark/benchmark_results/);
+
+## About
+
+This project aims to create a DB-like benchmark of feature generation (or feature aggregation) task. Especially the task of generating ML-features from the time-series data. In other words it is a benchmark of ETL tools on the task of generating the single partition of the Feature Store.
+
+See a detailed description on the [companion web-site](https://semyonsinchenko.github.io/feature-generation-benchmark/).
+
 ## Requirements
 
 - [maturin](https://github.com/PyO3/maturin)
+- [cargo](https://github.com/rust-lang/cargo)
 - Python 3.11
 - Java 8+ for PySpark
 
