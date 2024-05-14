@@ -25,7 +25,7 @@ def main_function(
     prefix: Annotated[str, typer.Option(help="Output files prefix")],
     size: Annotated[
         DatasetSizes,
-        typer.Option(help="Size of the dataset: 1K, 10K, 100K or 100M of customers, default is tiny"),
+        typer.Option(help="Size of the dataset: 1K, 10K, 100K or 1M of customers, default is tiny"),
     ] = DatasetSizes.TINY,
     seed: Annotated[int, typer.Option(help="Random seed value, default is 42")] = 42,
 ) -> None:
@@ -59,10 +59,10 @@ def main_function(
         days_in_partition = 7
     else:
         # For that case we have:
-        # 100_000_000 customers
+        # 1_000_000 customers
         # one partition is ~1 day
         # amount of partitions is 730 (~2 years)
-        dim = 1e8
+        dim = 1e6
         partitions = 730
         days_in_partition = 1
 

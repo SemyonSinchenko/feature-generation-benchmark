@@ -2,7 +2,7 @@
 
 ## About the project
 
-This project aims to create a DB-like benchmark of feature generation task. Especially for the task of generating ML-features from time-series data. In other words it is a benchmark of ETL tools on the task of generating the single partition of the Feature Store.
+This project aims to create a DB-like benchmark of feature generation (or feature aggregation) task. Especially the task of generating ML-features from time-series data. In other words it is a benchmark of ETL tools on the task of generating the single partition of the Feature Store.
 
 ## About the task of Feature Generation
 
@@ -24,15 +24,20 @@ In a result the transforms to an ETL (Extract-Transform-Load) pipeline with a ve
 
 ### The Feature Store approach
 
-Because generating thousand of features may be a complex task, it is a common way to create a table with precomputed features. That table is named "Feature Store".
+Because generating thousand of features may be a complex task, it is a common way to create a table with precomputed features. That table is typically named "Feature Store".
 
-Such a table is typically has a structure with two primary keys (ID of customer, Timestamp mark of the data for which features are up to date):
+Such a table typically has a structure with two primary keys:
+
+- ID of customer;
+- Timestamp mark of the data for which features are up to date);
 
 | customer_id | features_timestamp | feature1 | ... | featureN |
 | ----------- | ------------------ | -------- | --- | -------- |
 | id1         | 2024-05-12         | 1        | ... | 1000     |
 | id1         | 2024-05-13         | 3        | ... | 500      |
 | id2         | 2024-05-12         | -1       | ... | 750      |
+
+Where `feature1, ..., featureN` are aggregations per customer for different categories and for different time windows.
 
 ## Motivation
 
@@ -46,6 +51,15 @@ My benchmark is specified by the following:
 4. Skew in keys that simulates real-life cases: there are always customers who make much more transactions per day; or categories that are much popular than other;
 5. Generated data is partitioned by an offset (depends of the size it may be daily partitions, monthly partitions, etc.);
 6. Generated data is already in columnar data format ([Apache Parquet](https://parquet.apache.org/));
+7. The task is not to call a group by, but to resolve a real-life case that may have different approaches;
+
+### About H2O db-like benchmark
+
+There is also a [DB-like benchmark from H2O](https://h2oai.github.io/db-benchmark/). Why my benchmark is different:
+
+- My benchmark is end2end: from reading the data from columnar storage until the writing data back to columnar storage. H2O benchmark is designed for the case when data is already loaded to memory from a CSV file;
+- My benchmark is about generating ML-features from the data, not just compute aggregations. H2O benchmark is just about computation of aggregations;
+- My benchmark contains skew in keys: there are categories with distributions like 75% / 25%. Also some primary keys (customers id) are much more common than others. it is a simulation of a real life case, not just computation on synthetic data like in H2O benchmark;
 
 ## Description of the testing data
 
@@ -89,7 +103,7 @@ Is a category variable with 2 unique values (mobile, classic). Mobile appears wi
 
 **trx_amnt**
 
-Is a double variable that is used for next aggregations. Uniformly distributed random value.
+Is a double variable that is used for next aggregations. Uniformly distributed random value from 100 to 10,000.
 
 **t_minus**
 

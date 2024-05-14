@@ -2,13 +2,24 @@
 
 ## Setup
 
-My private Laptop for now:
+**EC2 m5.4xlarge**
 
-- 13th Gen Intel(R) Core(TM) i5-1335U;
-- 16Gb of RAM;
-- Fedora 40, Kernel 6.8
+| Key                   | Value                    |
+|-----------------------|--------------------------|
+| vCPUs                 | 16                       |
+| Memory (GiB)          | 64.0                     |
+| Memory per vCPU (GiB) | 4.0                      |
+| Physical Processor    | Intel Xeon Platinum 8175 |
+| Clock Speed (GHz)     | 3.1                      |
+| CPU Architecture      | x86_64                   |
 
-TODO: switch to GHA runners.
+[Details about the instance type](https://instances.vantage.sh/aws/ec2/m5.4xlarge)
+
+## Datasets
+
+All the information provided for a default seed 42. Size on disk is a total size of compressed parquet files. An amount of rows depends of SEED that was used for generation of the data because an amount of transactions for each id (customer id) per day is sampled from binomial distribution.
+
+See `src/lib.rs` for details of the implementation.
 
 ## Tiny Dataset
 
@@ -34,6 +45,21 @@ TODO: switch to GHA runners.
 
 | Tool | Approach  | Time of processing in seconds |
 | ---- | --------- | ----------------------------- |
-{% for key in results_tiny -%}
+{% for key in results_small -%}
 | {{ key }} | {{ results_small[key]["approach"] }} | {{ results_small[key]["total_time"] }} |
+{% endfor %}
+
+
+## Medium Dataset
+
+**Amount of rows:** 1,717,414,863
+
+**Size on disk:** 18 Gb
+
+**Unique IDs:** 100,000
+
+| Tool | Approach  | Time of processing in seconds |
+| ---- | --------- | ----------------------------- |
+{% for key in results_medium -%}
+| {{ key }} | {{ results_medium[key]["approach"] }} | {{ results_medium[key]["total_time"] }} |
 {% endfor %}

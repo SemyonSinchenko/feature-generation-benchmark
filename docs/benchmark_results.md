@@ -2,13 +2,24 @@
 
 ## Setup
 
-My private Laptop for now:
+**EC2 m5.4xlarge**
 
-- 13th Gen Intel(R) Core(TM) i5-1335U;
-- 16Gb of RAM;
-- Fedora 40, Kernel 6.8
+| Key                   | Value                    |
+|-----------------------|--------------------------|
+| vCPUs                 | 16                       |
+| Memory (GiB)          | 64.0                     |
+| Memory per vCPU (GiB) | 4.0                      |
+| Physical Processor    | Intel Xeon Platinum 8175 |
+| Clock Speed (GHz)     | 3.1                      |
+| CPU Architecture      | x86_64                   |
 
-TODO: switch to GHA runners.
+[Details about the instance type](https://instances.vantage.sh/aws/ec2/m5.4xlarge)
+
+## Datasets
+
+All the information provided for a default seed 42. Size on disk is a total size of compressed parquet files. An amount of rows depends of SEED that was used for generation of the data because an amount of transactions for each id (customer id) per day is sampled from binomial distribution.
+
+See `src/lib.rs` for details of the implementation.
 
 ## Tiny Dataset
 
@@ -20,8 +31,10 @@ TODO: switch to GHA runners.
 
 | Tool | Approach  | Time of processing in seconds |
 | ---- | --------  | ----------------------------- |
-| Pandas | Pivot | 13.05 |
-| PySpark | Case-When | 289.07 |
+| Pandas | Pivot | 24.12 |
+| PySpark | Case-When | 233.97 |
+| Polars | PivotEager | 4.61 |
+| Duckdb | Case-When | 35.51 |
 
 
 ## Small Dataset
@@ -34,5 +47,24 @@ TODO: switch to GHA runners.
 
 | Tool | Approach  | Time of processing in seconds |
 | ---- | --------- | ----------------------------- |
+| Pandas | Pivot | 214.51 |
+| PySpark | Case-When | 1782.17 |
+| Polars | PivotEager | 52.61 |
+| Duckdb | Case-When | 295.63 |
+
+
+
+## Medium Dataset
+
+**Amount of rows:** 1,717,414,863
+
+**Size on disk:** 18 Gb
+
+**Unique IDs:** 100,000
+
+| Tool | Approach  | Time of processing in seconds |
+| ---- | --------- | ----------------------------- |
 | Pandas | Pivot | OOM |
-| PySpark | Case-When | 2206.98 |
+| PySpark | Case-When | 17061.94 |
+| Polars | PivotEager | OOM |
+| Duckdb | Case-When | OOM |

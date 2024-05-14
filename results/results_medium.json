@@ -1,0 +1,22 @@
+{
+    "Pandas": {
+        "dataset": "test_data_medium",
+        "approach": "Pivot",
+        "total_time": -1
+    },
+    "PySpark": {
+        "dataset": "test_data_medium",
+        "approach": "Case-When",
+        "total_time": 17061.938628435135
+    },
+    "Polars": {
+        "dataset": "test_data_medium",
+        "approach": "PivotEager",
+        "total_time": -1
+    },
+    "Duckdb": {
+        "dataset": "test_data_medium",
+        "approach": "Case-When",
+        "total_time": -1
+    }
+}
