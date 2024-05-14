@@ -1,9 +1,9 @@
-import json
+import multiprocessing
 import shutil
 import sys
-import time
 from pathlib import Path
 
+from data_generation.helpers import BenchmarkWriter, DatasetSizes
 from pyspark.sql import Column, SparkSession
 from pyspark.sql import functions as F
 from rich import print
@@ -35,14 +35,13 @@ WINDOWS_IN_DAYS = (
     21,  # three weeks
     30,  # month
     90,  # three months
-    180, # half of the year
-    360, # year
-    720, # two years
+    180,  # half of the year
+    360,  # year
+    720,  # two years
 )
 
 # Information for result
-ENGINE_NAME = "PySpark"
-APPROACH_NAME = "Case-When"
+NAME = "PySpark case-when"
 
 
 def get_all_aggregations(col_prefix: str, cond: Column, cols_list: list[Column]) -> None:
@@ -60,47 +59,30 @@ def get_all_aggregations(col_prefix: str, cond: Column, cols_list: list[Column])
 
 if __name__ == "__main__":
     path = sys.argv[1]
-    json_results_out_file = None
-
-    if "tiny" in path:
-        json_results_out_file = "results_tiny.json"
-    elif "small" in path:
-        json_results_out_file = "results_small.json"
-    elif "medium" in path:
-        json_results_out_file = "results_medium.json"
-    else:
-        json_results_out_file = "results_big.json"
-
+    results_prefix = Path(__file__).parent.parent.joinpath("results")
     shutil.rmtree("tmp_out", ignore_errors=True)
 
-    # Before we go we save the information for the case of OOM
-    assert json_results_out_file is not None
-    json_results = Path(__file__).parent.parent.joinpath("results").joinpath(json_results_out_file)
-
-    if json_results.exists():
-        results_dict = json.load(json_results.open("r"))
+    if "tiny" in path:
+        task_size = DatasetSizes.TINY
+    elif "small" in path:
+        task_size = DatasetSizes.SMALL
+    elif "medium" in path:
+        task_size = DatasetSizes.MEDIUM
     else:
-        results_dict = {}
+        task_size = DatasetSizes.BIG
 
-    results_dict[ENGINE_NAME] = {
-        "dataset": path,
-        "approach": APPROACH_NAME,
-        "total_time": -1, # Indicator of OOM/Error; we will overwrite it in the case of success
-    }
-
-    with json_results.open("w") as file_:
-        json.dump(obj=results_dict, fp=file_, indent=1)
-
+    # Before we go we save the information for the case of OOM
+    helper = BenchmarkWriter(NAME, task_size, results_prefix)
     # Start the work
-    start_time = time.time()
+    helper.before()
 
     # Partially inspired by:
     # 1. https://github.com/h2oai/db-benchmark/blob/master/spark/groupby-spark.py
     # 2. https://github.com/MrPowers/quinn/issues/143
     spark = (
         SparkSession.builder.master("local[*]")
-        .config("spark.driver.memory", "16g")
-        .config("spark.executor.memory", "16g")
+        .config("spark.driver.memory", "64g")
+        .config("spark.executor.memory", "64g")
         .config("spark.sql.shuffle.partitions", "1")
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
@@ -149,25 +131,6 @@ if __name__ == "__main__":
     result = data.groupBy("customer_id").agg(*cols_list)
     result.write.mode("overwrite").parquet("tmp_out")
 
-    end_time = time.time()
-    total_time = end_time - start_time
+    total_time = helper.after()
     print(f"[italic green]Total time: {total_time} seconds[/italic green]")
-
-    # Write results
-    print("[italic green]Dump results to JSON...[/italic green]")
-    if json_results.exists():
-        results_dict = json.load(json_results.open("r"))
-    else:
-        results_dict = {}
-
-    results_dict[ENGINE_NAME] = {
-        "dataset": path,
-        "approach": APPROACH_NAME,
-        "total_time": total_time,
-    }
-
-    with json_results.open("w") as file_:
-        json.dump(obj=results_dict, fp=file_, indent=1)
-
-    print("[italic green]Done.[/italic green]")
     sys.exit(0)

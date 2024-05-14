@@ -1,22 +1,8 @@
 {
-    "Pandas": {
-        "dataset": "test_data_tiny",
-        "approach": "Pivot",
-        "total_time": 24.123688220977783
-    },
-    "PySpark": {
-        "dataset": "test_data_tiny",
-        "approach": "Case-When",
-        "total_time": 233.96962332725525
-    },
-    "Polars": {
-        "dataset": "test_data_tiny",
-        "approach": "PivotEager",
-        "total_time": 4.611529588699341
-    },
-    "Duckdb": {
-        "dataset": "test_data_tiny",
-        "approach": "Case-When",
-        "total_time": 35.50917625427246
-    }
+  "PySpark pandas-udf": 187.10792350769043,
+  "PySpark case-when": -1,
+  "Pandas pivot": 35.2749810218811,
+  "Polars pivot": 11.391130208969116,
+  "DuckDB pivot": 9.10414457321167,
+  "DuckDB case-when": -1
 }

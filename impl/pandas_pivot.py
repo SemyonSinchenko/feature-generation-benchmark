@@ -1,11 +1,10 @@
-import json
 import shutil
 import sys
-import time
 from functools import reduce
 from pathlib import Path
 
 import pandas as pd
+from data_generation.helpers import BenchmarkWriter, DatasetSizes
 from rich import print
 
 # See lib.rs for details about constants
@@ -35,16 +34,14 @@ WINDOWS_IN_DAYS = (
     21,  # three weeks
     30,  # month
     90,  # three months
-    180, # half of the year
-    360, # year
-    720, # two years
+    180,  # half of the year
+    360,  # year
+    720,  # two years
 )
 
 
 # Information for result
-ENGINE_NAME = "Pandas"
-APPROACH_NAME = "Pivot"
-
+NAME = "Pandas pivot"
 
 def generate_pivoted_batch(data: pd.DataFrame, t_minus: int, groups: list[str]) -> pd.DataFrame:
     pre_agg = (
@@ -63,38 +60,23 @@ def generate_pivoted_batch(data: pd.DataFrame, t_minus: int, groups: list[str]) 
 
 if __name__ == "__main__":
     path = sys.argv[1]
-    json_results_out_file = None
 
     if "tiny" in path:
-        json_results_out_file = "results_tiny.json"
+        task_size = DatasetSizes.TINY
     elif "small" in path:
-        json_results_out_file = "results_small.json"
+        task_size = DatasetSizes.SMALL
     elif "medium" in path:
-        json_results_out_file = "results_medium.json"
+        task_size = DatasetSizes.MEDIUM
     else:
-        json_results_out_file = "results_big.json"
+        task_size = DatasetSizes.BIG
 
     shutil.rmtree("tmp_out", ignore_errors=True)
 
-    # Before we go we save the information for the case of OOM
-    json_results = Path(__file__).parent.parent.joinpath("results").joinpath(json_results_out_file)
-
-    if json_results.exists():
-        results_dict = json.load(json_results.open("r"))
-    else:
-        results_dict = {}
-
-    results_dict[ENGINE_NAME] = {
-        "dataset": path,
-        "approach": APPROACH_NAME,
-        "total_time": -1,  # Indicator of OOM/Error; we will overwrite it in the case of success
-    }
-
-    with json_results.open("w") as file_:
-        json.dump(obj=results_dict, fp=file_, indent=1)
+    results_prefix = Path(__file__).parent.parent.joinpath("results")
+    helper = BenchmarkWriter(NAME, task_size, results_prefix)
 
     # Start the work
-    start_time = time.time()
+    helper.before()
 
     data = pd.read_parquet(path)
 
@@ -123,26 +105,7 @@ if __name__ == "__main__":
         .to_parquet("../tmp_out")
     )
 
-    end_time = time.time()
-    total_time = end_time - start_time
+    total_time = helper.after()
 
     print(f"[italic green]Total time: {total_time} seconds[/italic green]")
-
-    # Write results
-    print("[italic green]Dump results to JSON...[/italic green]")
-    if json_results.exists():
-        results_dict = json.load(json_results.open("r"))
-    else:
-        results_dict = {}
-
-    results_dict[ENGINE_NAME] = {
-        "dataset": path,
-        "approach": APPROACH_NAME,
-        "total_time": total_time,
-    }
-
-    with json_results.open("w") as file_:
-        json.dump(obj=results_dict, fp=file_, indent=1)
-
-    print("[italic green]Done.[/italic green]")
     sys.exit(0)

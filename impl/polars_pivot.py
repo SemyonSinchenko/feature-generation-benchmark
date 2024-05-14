@@ -1,10 +1,9 @@
-import json
 import shutil
 import sys
-import time
 from pathlib import Path
 
 import polars as pl
+from data_generation.helpers import BenchmarkWriter, DatasetSizes
 from rich import print
 
 # See lib.rs for details about constants
@@ -34,19 +33,17 @@ WINDOWS_IN_DAYS = (
     21,  # three weeks
     30,  # month
     90,  # three months
-    180, # half of the year
-    360, # year
-    720, # two years
+    180,  # half of the year
+    360,  # year
+    720,  # two years
 )
 
 
 # Information for result
-ENGINE_NAME = "Polars"
-APPROACH_NAME = "PivotEager"
+NAME = "Polars pivot"
 
 
 def generate_pivoted_batch(data: pl.DataFrame, t_minus: int, groups: list[str]) -> pl.DataFrame:
-
     pivoted = (
         data.filter(pl.col("t_minus") <= t_minus)
         .group_by(["customer_id"] + groups)
@@ -59,30 +56,18 @@ def generate_pivoted_batch(data: pl.DataFrame, t_minus: int, groups: list[str]) 
                 pl.max("trx_amnt").alias("max"),
             ]
         )
-        .pivot(
-            index="customer_id",
-            columns=groups,
-            values=[
-                "count", 
-                "mean", 
-                "sum", 
-                "min", 
-                "max"
-            ]
-        )
+        .pivot(index="customer_id", columns=groups, values=["count", "mean", "sum", "min", "max"])
     )
 
     # Polars make some nasty looking column names when pivoting.
     pivoted = pivoted.rename(
         {
             column: (
-                column.split("_")[-1]
-                .replace('{', '')
-                .replace('}', '')
-                .replace('"', '')
-                .replace(",","_") 
-                + f"_{t_minus}d_" + column.split("_")[0]
-            ) for column in pivoted.columns
+                column.split("_")[-1].replace("{", "").replace("}", "").replace('"', "").replace(",", "_")
+                + f"_{t_minus}d_"
+                + column.split("_")[0]
+            )
+            for column in pivoted.columns
             if column != "customer_id"
         }
     )
@@ -91,38 +76,23 @@ def generate_pivoted_batch(data: pl.DataFrame, t_minus: int, groups: list[str]) 
 
 if __name__ == "__main__":
     path = sys.argv[1]
-    json_results_out_file = None
 
     if "tiny" in path:
-        json_results_out_file = "results_tiny.json"
+        task_size = DatasetSizes.TINY
     elif "small" in path:
-        json_results_out_file = "results_small.json"
+        task_size = DatasetSizes.SMALL
     elif "medium" in path:
-        json_results_out_file = "results_medium.json"
+        task_size = DatasetSizes.MEDIUM
     else:
-        json_results_out_file = "results_big.json"
+        task_size = DatasetSizes.BIG
 
     shutil.rmtree("tmp_out", ignore_errors=True)
 
-    # Before we go we save the information for the case of OOM
-    json_results = Path(__file__).parent.parent.joinpath("results").joinpath(json_results_out_file)
-
-    if json_results.exists():
-        results_dict = json.load(json_results.open("r"))
-    else:
-        results_dict = {}
-
-    results_dict[ENGINE_NAME] = {
-        "dataset": path,
-        "approach": APPROACH_NAME,
-        "total_time": -1,  # Indicator of OOM/Error; we will overwrite it in the case of success
-    }
-
-    with json_results.open("w") as file_:
-        json.dump(obj=results_dict, fp=file_, indent=1)
+    results_prefix = Path(__file__).parent.parent.joinpath("results")
+    helper = BenchmarkWriter(NAME, task_size, results_prefix)
 
     # Start the work
-    start_time = time.time()
+    helper.before()
 
     data = pl.read_parquet(path + "/**/*.parquet")
 
@@ -145,31 +115,8 @@ if __name__ == "__main__":
         # Iterate over combination channel + trx_type
         dfs_list.append(generate_pivoted_batch(data, win, ["channel", "trx_type"]))
 
-    (
-        pl.concat(dfs_list, how="align")
-        .write_parquet("../tmp_out")
-    )
+    (pl.concat(dfs_list, how="align").write_parquet("../tmp_out"))
 
-    end_time = time.time()
-    total_time = end_time - start_time
-
+    total_time = helper.after()
     print(f"[italic green]Total time: {total_time} seconds[/italic green]")
-
-    # Write results
-    print("[italic green]Dump results to JSON...[/italic green]")
-    if json_results.exists():
-        results_dict = json.load(json_results.open("r"))
-    else:
-        results_dict = {}
-
-    results_dict[ENGINE_NAME] = {
-        "dataset": path,
-        "approach": APPROACH_NAME,
-        "total_time": total_time,
-    }
-
-    with json_results.open("w") as file_:
-        json.dump(obj=results_dict, fp=file_, indent=1)
-
-    print("[italic green]Done.[/italic green]")
     sys.exit(0)
