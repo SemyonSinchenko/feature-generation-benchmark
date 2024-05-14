@@ -127,6 +127,7 @@ if __name__ == "__main__":
         #print(sql_list)
 
     sql = f"""
+        set temp_directory = '../tmp_spill/';
         copy (
             select
                 customer_id, 
