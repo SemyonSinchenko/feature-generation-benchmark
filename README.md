@@ -40,8 +40,8 @@ Contributions are very welcome. I created that benchmark not to prove that one f
 
 What would be cool:
 
-- [ ] Implement the same task in [DuckDB](https://duckdb.org/);
-- [ ] Implement the same task in [Polars](https://pola.rs/);
+- [x] Implement the same task in [DuckDB](https://duckdb.org/);
+- [x] Implement the same task in [Polars](https://pola.rs/);
 - [ ] Implement the same task in [Dusk](https://www.dask.org/);
 - [ ] Implement different approaches for `Pandas`;
 - [ ] Implement different approaches for `Spark`;
