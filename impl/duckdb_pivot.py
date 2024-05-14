@@ -42,18 +42,7 @@ WINDOWS_IN_DAYS = (
 
 # Information for result
 ENGINE_NAME = "DuckDB"
-APPROACH_NAME = "Case-When"
-
-
-def generate_sql_query(col_prefix: int, sql_condition: str) -> str:
-    sql_columns = f"""
-        sum(case when {sql_condition} then 1 else 0 end) as '{col_prefix}_count',
-        mean(case when {sql_condition} then trx_amnt else null end) as '{col_prefix}_mean',
-        sum(case when {sql_condition} then trx_amnt else null end) as '{col_prefix}_sum',
-        min(case when {sql_condition} then trx_amnt else null end) as '{col_prefix}_min',
-        max(case when {sql_condition} then trx_amnt else null end) as '{col_prefix}_max'
-    """
-    return sql_columns
+APPROACH_NAME = "Pivot"
 
 
 if __name__ == "__main__":
@@ -100,45 +89,49 @@ if __name__ == "__main__":
     #  5   t_minus      int64
     #  6   part_col     category
 
-    cols_list: list[str] = []
-
-    for win in WINDOWS_IN_DAYS:
-
-        for card_type in CARD_TYPES:
-            for trx_type in TRANSACTION_TYPES:
-                sql_condition = f"t_minus <= {win} " 
-                sql_condition += f"and card_type = '{card_type}' "
-                sql_condition += f"and trx_type = '{trx_type}' "
-
-                col_prefix = f"{card_type}_{trx_type}_{win}d"
-
-                cols_list.append(generate_sql_query(col_prefix, sql_condition))
-
-        for ch_type in CHANNELS:
-            for trx_type in TRANSACTION_TYPES:
-                sql_condition = f"t_minus <= {win} " 
-                sql_condition += f"and channel = '{ch_type}' "
-                sql_condition += f"and trx_type = '{trx_type}' "
-
-                col_prefix = f"{ch_type}_{trx_type}_{win}d"
-
-                cols_list.append(generate_sql_query(col_prefix, sql_condition))
-        # Iterate over combination card_type + trx_type
-        #sql_list.append(generate_pivot_sql_query(win, ["card_type", "trx_type"]))
-        #print(sql_list)
+    sql = f"""
+        with base_table as (
+            select
+                *
+            from
+                read_parquet("./{path}/**/*.parquet")
+            ),
+        all_windows as (
+            {
+                " union all ".join(
+                    [
+                        f"select *, '{win}' as t_minus from base_table where t_minus <= {win}" for win in WINDOWS_IN_DAYS
+                    ]
+                )
+            }
+        ),
+        card_type_agg as (
+            pivot all_windows
+            on card_type, trx_type, t_minus_1
+            using count(trx_amnt) as 'd_count', mean(trx_amnt) as 'd_mean', sum(trx_amnt) as 'd_sum', min(trx_amnt) as 'd_min', max(trx_amnt) as 'd_max'
+            group by customer_id
+        ),
+        channel_type_agg as ( 
+            pivot all_windows
+            on channel, trx_type, t_minus_1
+            using count(trx_amnt) as 'd_count', mean(trx_amnt) as 'd_mean', sum(trx_amnt) as 'd_sum', min(trx_amnt) as 'd_min', max(trx_amnt) as 'd_max'
+            group by customer_id 
+        )
+        select
+            a.*,
+            b.* exclude(customer_id)
+        from card_type_agg a
+        full join channel_type_agg b
+            on a.customer_id = b.customer_id
+    """    
 
     sql = f"""
         set temp_directory = '../tmp_spill/';
         copy (
-            select
-                customer_id, 
-                {",".join(cols_list)}
-            from read_parquet("./{path}/**/*.parquet")
-            group by customer_id
+            {sql}
         ) to '../tmp_out'
         (format 'parquet', compression 'zstd');
     """
-
     # Start the work
     start_time = time.time()
 
