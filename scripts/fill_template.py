@@ -22,19 +22,19 @@ if __name__ == "__main__":
         if results_tiny[key] == -1:
             results_tiny[key] = "OOM"
         else:
-            results_tiny[key] = f"{results_tiny[key]['total_time']:.2f}"
+            results_tiny[key] = f"{results_tiny[key]:.2f}"
 
     for key in results_small:
         if results_small[key] == -1:
             results_small[key] = "OOM"
         else:
-            results_small[key] = f"{results_small[key]['total_time']:.2f}"
+            results_small[key] = f"{results_small[key]:.2f}"
 
     for key in results_medium:
         if results_medium[key] == -1:
             results_medium[key] = "OOM"
         else:
-            results_medium[key] = f"{results_medium[key]['total_time']:.2f}"
+            results_medium[key] = f"{results_medium[key]:.2f}"
 
     with proj_root.joinpath("docs").joinpath("benchmark_results.md").open("w") as file_:
         filled = template.render(

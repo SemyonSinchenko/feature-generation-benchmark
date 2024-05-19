@@ -12,6 +12,7 @@
 | Physical Processor    | Intel Xeon Platinum 8175 |
 | Clock Speed (GHz)     | 3.1                      |
 | CPU Architecture      | x86_64                   |
+| Disk space            | 256 Gb                   |
 
 [Details about the instance type](https://instances.vantage.sh/aws/ec2/m5.4xlarge)
 
@@ -29,12 +30,14 @@ See `src/lib.rs` for details of the implementation.
 
 **Unique IDs:** 1,000
 
-| Tool | Approach  | Time of processing in seconds |
-| ---- | --------  | ----------------------------- |
-| Pandas | Pivot | 24.12 |
-| PySpark | Case-When | 233.97 |
-| Polars | PivotEager | 4.61 |
-| Duckdb | Case-When | 35.51 |
+| Tool | Time of processing in seconds |
+| ---- | ----------------------------- |
+| PySpark pandas-udf | 78.31 |
+| PySpark case-when | 242.84 |
+| Pandas pivot | 23.91 |
+| Polars pivot | 4.54 |
+| DuckDB pivot | 4.10 |
+| DuckDB case-when | 36.59 |
 
 
 ## Small Dataset
@@ -45,12 +48,14 @@ See `src/lib.rs` for details of the implementation.
 
 **Unique IDs:** 10,000
 
-| Tool | Approach  | Time of processing in seconds |
-| ---- | --------- | ----------------------------- |
-| Pandas | Pivot | 214.51 |
-| PySpark | Case-When | 1782.17 |
-| Polars | PivotEager | 52.61 |
-| Duckdb | Case-When | 295.63 |
+| Tool | Time of processing in seconds |
+| ---- | ----------------------------- |
+| Pandas pivot | 214.67 |
+| Polars pivot | 41.20 |
+| DuckDB pivot | 28.60 |
+| DuckDB case-when | 304.52 |
+| PySpark pandas-udf | 516.38 |
+| PySpark case-when | 1808.99 |
 
 
 
@@ -62,9 +67,10 @@ See `src/lib.rs` for details of the implementation.
 
 **Unique IDs:** 100,000
 
-| Tool | Approach  | Time of processing in seconds |
-| ---- | --------- | ----------------------------- |
-| Pandas | Pivot | OOM |
-| PySpark | Case-When | 17061.94 |
-| Polars | PivotEager | OOM |
-| Duckdb | Case-When | OOM |
+| Tool | Time of processing in seconds |
+| ---- | ----------------------------- |
+| Pandas pivot | OOM |
+| Polars pivot | OOM |
+| DuckDB pivot | 2181.59 |
+| PySpark pandas-udf | 5983.14 |
+| PySpark case-when | 17653.46 |

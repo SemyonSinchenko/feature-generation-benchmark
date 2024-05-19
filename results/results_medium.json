@@ -1,0 +1,7 @@
+{
+    "Pandas pivot": -1,
+    "Polars pivot": -1,
+    "DuckDB pivot": 2181.5874252319336,
+    "PySpark pandas-udf": 5983.137866973877,
+    "PySpark case-when": 17653.461864709854
+}
