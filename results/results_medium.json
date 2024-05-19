@@ -1,22 +1,7 @@
 {
-    "Pandas": {
-        "dataset": "test_data_medium",
-        "approach": "Pivot",
-        "total_time": -1
-    },
-    "PySpark": {
-        "dataset": "test_data_medium",
-        "approach": "Case-When",
-        "total_time": 17061.938628435135
-    },
-    "Polars": {
-        "dataset": "test_data_medium",
-        "approach": "PivotEager",
-        "total_time": -1
-    },
-    "Duckdb": {
-        "dataset": "test_data_medium",
-        "approach": "Case-When",
-        "total_time": -1
-    }
+    "Pandas pivot": -1,
+    "Polars pivot": -1,
+    "DuckDB pivot": 2181.5874252319336,
+    "PySpark pandas-udf": 5983.137866973877,
+    "PySpark case-when": 17653.461864709854
 }
