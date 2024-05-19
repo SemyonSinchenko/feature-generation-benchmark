@@ -7,7 +7,6 @@ import multiprocessing
 import pandas as pd
 from data_generation.helpers import BenchmarkWriter, DatasetSizes
 from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
 from pyspark.sql.types import DoubleType, IntegerType, StructField, StructType
 from rich import print
 
@@ -62,13 +61,24 @@ def generate_pivoted_batch(data: pd.DataFrame, t_minus: int, groups: list[str]) 
     return pivoted
 
 
-def generate_all_aggregations(data: pd.DataFrame) -> pd.DataFrame:
-    dfs_list = []
-    for win in WINDOWS_IN_DAYS:
-        dfs_list.append(generate_pivoted_batch(data, win, ["card_type", "trx_type"]))
-        dfs_list.append(generate_pivoted_batch(data, win, ["channel", "trx_type"]))
+def get_processing_func(expected_cols: list[str]):
+    def generate_all_aggregations(data: pd.DataFrame) -> pd.DataFrame:
+        dfs_list = []
+        for win in WINDOWS_IN_DAYS:
+            dfs_list.append(generate_pivoted_batch(data, win, ["card_type", "trx_type"]))
+            dfs_list.append(generate_pivoted_batch(data, win, ["channel", "trx_type"]))
 
-    return reduce(lambda a, b: pd.merge(a, b, left_index=True, right_index=True), dfs_list).reset_index(drop=False)
+        out_df = reduce(lambda a, b: pd.merge(a, b, left_index=True, right_index=True), dfs_list).reset_index(
+            drop=False
+        )
+        if len(out_df.columns) < len(expected_cols):
+            for field in expected_cols:
+                if field not in out_df.columns:
+                    out_df[field] = pd.Series(dtype="Float64")
+
+        return out_df
+
+    return generate_all_aggregations
 
 
 if __name__ == "__main__":
@@ -136,7 +146,8 @@ if __name__ == "__main__":
 
     data = spark.read.parquet(path)
 
-    result = data.groupBy("customer_id").applyInPandas(generate_all_aggregations, schema)
+    processing_fun = get_processing_func(schema.fieldNames())
+    result = data.groupBy("customer_id").applyInPandas(processing_fun, schema)
     result.write.mode("overwrite").parquet("tmp_out")
 
     total_time = helper.after()

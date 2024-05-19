@@ -45,7 +45,7 @@ WINDOWS_IN_DAYS = (
 NAME = "DuckDB case-when"
 
 
-def generate_sql_query(col_prefix: int, sql_condition: str) -> str:
+def generate_sql_query(col_prefix: str, sql_condition: str) -> str:
     sql_columns = f"""
         sum(case when {sql_condition} then 1 else 0 end) as '{col_prefix}_count',
         mean(case when {sql_condition} then trx_amnt else null end) as '{col_prefix}_mean',
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         set temp_directory = '../tmp_spill/';
         copy (
             select
-                customer_id, 
+                customer_id,
                 {",".join(cols_list)}
             from read_parquet("./{path}/**/*.parquet")
             group by customer_id
