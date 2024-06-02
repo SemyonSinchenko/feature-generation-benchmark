@@ -4,5 +4,6 @@
     "Pandas pivot": 23.912136793136597,
     "Polars pivot": 4.541804313659668,
     "DuckDB pivot": 4.098507404327393,
-    "DuckDB case-when": 36.58749794960022
+    "DuckDB case-when": 36.58749794960022,
+    "PySpark Comet case-when": 96.93027114868164,
 }
