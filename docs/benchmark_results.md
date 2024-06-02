@@ -38,6 +38,7 @@ See `src/lib.rs` for details of the implementation.
 | Polars pivot | 4.54 |
 | DuckDB pivot | 4.10 |
 | DuckDB case-when | 36.59 |
+| PySpark Comet case-when | 96.93 |
 
 
 ## Small Dataset
@@ -56,6 +57,7 @@ See `src/lib.rs` for details of the implementation.
 | DuckDB case-when | 304.52 |
 | PySpark pandas-udf | 516.38 |
 | PySpark case-when | 1808.99 |
+| PySpark Comet case-when | 651.84 |
 
 
 
@@ -74,3 +76,4 @@ See `src/lib.rs` for details of the implementation.
 | DuckDB pivot | 2181.59 |
 | PySpark pandas-udf | 5983.14 |
 | PySpark case-when | 17653.46 |
+| PySpark Comet case-when | 4635.37 |

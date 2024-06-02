@@ -91,12 +91,14 @@ def get_processing_func(expected_cols: list[str]):
             dfs_list.append(generate_pivoted_batch(pl_df, win, ["channel", "trx_type"]))
 
         out_df = pl.concat(dfs_list, how="align")
+
+        missing_cols = []
         if len(out_df.columns) < len(expected_cols):
             for field in expected_cols:
                 if field not in out_df.columns:
-                    out_df[field] = pl.Series(dtype=pl.Float64)
+                    missing_cols.append(pl.lit(None).cast(pl.Float64).alias(field))
 
-        return out_df.to_arrow()
+        return out_df.with_columns(missing_cols).to_arrow()
 
     return generate_all_aggregations
 
