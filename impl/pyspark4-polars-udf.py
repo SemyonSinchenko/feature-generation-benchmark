@@ -92,11 +92,15 @@ def get_processing_func(expected_cols: list[str]):
 
         out_df = pl.concat(dfs_list, how="align")
 
+        # It is possible that a customer do not have transaction in a category
         missing_cols = []
         if len(out_df.columns) < len(expected_cols):
             for field in expected_cols:
                 if field not in out_df.columns:
-                    missing_cols.append(pl.lit(None).cast(pl.Float64).alias(field))
+                    if field.endswith("count"):
+                        missing_cols.append(pl.lit(None).cast(pl.Int64).alias(field))
+                    else:
+                        missing_cols.append(pl.lit(None).cast(pl.Float64).alias(field))
 
         return out_df.with_columns(missing_cols).to_arrow()
 
