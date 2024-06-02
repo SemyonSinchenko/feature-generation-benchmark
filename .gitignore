@@ -465,3 +465,4 @@ tmp_out*
 
 # Rust things
 .so
+datafusion-comet
