@@ -92,8 +92,8 @@ if __name__ == "__main__":
     # 2. https://github.com/MrPowers/quinn/issues/143
     spark = (
         SparkSession.builder.master("local[*]")
-        .config("spark.driver.memory", "14g")
-        .config("spark.executor.memory", "14g")
+        .config("spark.driver.memory", "60g")
+        .config("spark.executor.memory", "60g")
         .config("spark.sql.shuffle.partitions", "1")
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
