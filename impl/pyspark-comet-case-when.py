@@ -140,9 +140,6 @@ if __name__ == "__main__":
                 get_all_aggregations(col_prefix, agg_cols_list)
 
     result = data.select(*cols_list).groupBy("customer_id").agg(*agg_cols_list)
-    with open("plan.txt", "w") as _file:
-        with contextlib.redirect_stdout(_file):
-            result.explain(extended=True)
     result.write.mode("overwrite").parquet("tmp_out")
 
     total_time = helper.after()

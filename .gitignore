@@ -466,3 +466,4 @@ tmp_out*
 # Rust things
 .so
 datafusion-comet
+pyspark-4.0*
