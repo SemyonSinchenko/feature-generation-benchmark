@@ -1,4 +1,5 @@
 import contextlib
+import multiprocessing
 import shutil
 import sys
 from pathlib import Path
@@ -45,15 +46,9 @@ NAME = "PySpark Comet case-when"
 
 
 def get_raw_cols(col_prefix: str, cond: Column, raw_cols: list[Column]) -> None:
-    raw_cols.append(
-        F.when(cond, F.lit(1)).otherwise(F.lit(0)).alias(f"{col_prefix}_flag")
-    )
-    raw_cols.append(
-        F.when(cond, F.col("trx_amnt")).otherwise(F.lit(None)).alias(f"{col_prefix}_or_none")
-    )
-    raw_cols.append(
-        F.when(cond, F.col("trx_amnt")).otherwise(F.lit(0)).alias(f"{col_prefix}_or_zero")
-    )
+    raw_cols.append(F.when(cond, F.lit(1)).otherwise(F.lit(0)).alias(f"{col_prefix}_flag"))
+    raw_cols.append(F.when(cond, F.col("trx_amnt")).otherwise(F.lit(None)).alias(f"{col_prefix}_or_none"))
+    raw_cols.append(F.when(cond, F.col("trx_amnt")).otherwise(F.lit(0)).alias(f"{col_prefix}_or_zero"))
 
 
 def get_all_aggregations(col_prefix: str, cols_list: list[Column]) -> None:
@@ -91,11 +86,12 @@ if __name__ == "__main__":
     # Partially inspired by:
     # 1. https://github.com/h2oai/db-benchmark/blob/master/spark/groupby-spark.py
     # 2. https://github.com/MrPowers/quinn/issues/143
+    available_cores = multiprocessing.cpu_count()
     spark = (
         SparkSession.builder.master("local[*]")
         .config("spark.driver.memory", "10g")
         .config("spark.executor.memory", "10g")
-        .config("spark.sql.shuffle.partitions", "11")
+        .config("spark.sql.shuffle.partitions", f"{available_cores}")
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
         .config("spark.log.level", "ERROR")

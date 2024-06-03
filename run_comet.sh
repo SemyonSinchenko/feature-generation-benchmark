@@ -4,6 +4,7 @@ COMET_JAR=datafusion-comet/spark/target/comet-spark-spark3.4_2.12-0.1.0-SNAPSHOT
 spark-submit \
     --jars $COMET_JAR \
     --conf spark.sql.adaptive.enabled=false \
+    --conf spark.sql.adaptive.coalescePartitions.enabled=false \
     --conf spark.driver.extraClassPath=$COMET_JAR \
     --conf spark.executor.extraClassPath=$COMET_JAR \
     --conf spark.sql.extensions=org.apache.comet.CometSparkSessionExtensions \

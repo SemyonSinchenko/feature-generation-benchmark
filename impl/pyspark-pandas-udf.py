@@ -1,8 +1,8 @@
+import multiprocessing
 import shutil
 import sys
 from functools import reduce
 from pathlib import Path
-import multiprocessing
 
 import pandas as pd
 from data_generation.helpers import BenchmarkWriter, DatasetSizes
