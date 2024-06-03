@@ -1,3 +1,4 @@
+import contextlib
 import shutil
 import sys
 from pathlib import Path
@@ -55,7 +56,7 @@ def get_raw_cols(col_prefix: str, cond: Column, raw_cols: list[Column]) -> None:
     )
 
 
-def get_all_aggregations(col_prefix: str, cond: Column, cols_list: list[Column]) -> None:
+def get_all_aggregations(col_prefix: str, cols_list: list[Column]) -> None:
     # Count over group
     cols_list.append(F.sum(F.col(f"{col_prefix}_flag")).alias(f"{col_prefix}_count"))
     # Average over group
@@ -92,9 +93,9 @@ if __name__ == "__main__":
     # 2. https://github.com/MrPowers/quinn/issues/143
     spark = (
         SparkSession.builder.master("local[*]")
-        .config("spark.driver.memory", "60g")
-        .config("spark.executor.memory", "60g")
-        .config("spark.sql.shuffle.partitions", "1")
+        .config("spark.driver.memory", "10g")
+        .config("spark.executor.memory", "10g")
+        .config("spark.sql.shuffle.partitions", "11")
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
         .config("spark.log.level", "ERROR")
@@ -126,7 +127,7 @@ if __name__ == "__main__":
                 col_prefix = f"{card_type}_{trx_type}_{win}d"
 
                 get_raw_cols(col_prefix, cond, cols_list)
-                get_all_aggregations(col_prefix, cond, agg_cols_list)
+                get_all_aggregations(col_prefix, agg_cols_list)
 
         # Iterate over combination channel + trx_type
         for ch_type in CHANNELS:
@@ -140,9 +141,12 @@ if __name__ == "__main__":
                 col_prefix = f"{ch_type}_{trx_type}_{win}d"
 
                 get_raw_cols(col_prefix, cond, cols_list)
-                get_all_aggregations(col_prefix, cond, agg_cols_list)
+                get_all_aggregations(col_prefix, agg_cols_list)
 
     result = data.select(*cols_list).groupBy("customer_id").agg(*agg_cols_list)
+    with open("plan.txt", "w") as _file:
+        with contextlib.redirect_stdout(_file):
+            result.explain(extended=True)
     result.write.mode("overwrite").parquet("tmp_out")
 
     total_time = helper.after()
