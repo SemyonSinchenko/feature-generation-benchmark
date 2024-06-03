@@ -89,8 +89,8 @@ if __name__ == "__main__":
     available_cores = multiprocessing.cpu_count()
     spark = (
         SparkSession.builder.master("local[*]")
-        .config("spark.driver.memory", "10g")
-        .config("spark.executor.memory", "10g")
+        .config("spark.driver.memory", "60g")
+        .config("spark.executor.memory", "60g")
         .config("spark.sql.shuffle.partitions", f"{available_cores}")
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
