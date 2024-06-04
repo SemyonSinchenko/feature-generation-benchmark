@@ -6,5 +6,6 @@
     "PySpark case-when": 17653.461864709854,
     "PySpark Comet case-when": 4873.537589073181,
     "PySpark-4 polars-udf": 4704.727216005325,
-    "PySpark pivot": 455.48546409606934
+    "PySpark pivot": 455.48546409606934,
+    "PySpark Comet pivot": 412.1713216304779
 }

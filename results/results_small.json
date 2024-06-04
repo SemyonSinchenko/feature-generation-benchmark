@@ -1,11 +1,12 @@
 {
-    "Pandas pivot": -1,
-    "Polars pivot": -1,
-    "DuckDB pivot": 2181.5874252319336,
-    "PySpark pandas-udf": 5983.137866973877,
-    "PySpark case-when": 17653.461864709854,
-    "PySpark Comet case-when": 4873.537589073181,
-    "PySpark-4 polars-udf": 4704.727216005325,
-    "PySpark pivot": 455.48546409606934,
-    "PySpark Comet pivot": 412.1713216304779
+    "Pandas pivot": 214.66964602470398,
+    "Polars pivot": 41.2032790184021,
+    "DuckDB pivot": 28.596801280975342,
+    "DuckDB case-when": 304.51860308647156,
+    "PySpark pandas-udf": 516.3818678855896,
+    "PySpark case-when": 1808.9883704185486,
+    "PySpark Comet case-when": 729.7482228279114,
+    "PySpark-4 polars-udf": 356.1914813518524,
+    "PySpark pivot": 151.59994101524353,
+    "PySpark Comet pivot": 131.28750085830688
 }

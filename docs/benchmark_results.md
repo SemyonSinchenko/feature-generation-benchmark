@@ -56,15 +56,16 @@ See `src/lib.rs` for details of the implementation.
 
 | Tool | Time of processing in seconds |
 | ---- | ----------------------------- |
-| Pandas pivot | OOM |
-| Polars pivot | OOM |
-| DuckDB pivot | 2181.59 |
-| PySpark pandas-udf | 5983.14 |
-| PySpark case-when | 17653.46 |
-| PySpark Comet case-when | 4873.54 |
-| PySpark-4 polars-udf | 4704.73 |
-| PySpark pivot | 455.49 |
-| PySpark Comet pivot | 412.17 |
+| Pandas pivot | 214.67 |
+| Polars pivot | 41.20 |
+| DuckDB pivot | 28.60 |
+| DuckDB case-when | 304.52 |
+| PySpark pandas-udf | 516.38 |
+| PySpark case-when | 1808.99 |
+| PySpark Comet case-when | 729.75 |
+| PySpark-4 polars-udf | 356.19 |
+| PySpark pivot | 151.60 |
+| PySpark Comet pivot | 131.29 |
 
 
 
@@ -86,3 +87,4 @@ See `src/lib.rs` for details of the implementation.
 | PySpark Comet case-when | 4873.54 |
 | PySpark-4 polars-udf | 4704.73 |
 | PySpark pivot | 455.49 |
+| PySpark Comet pivot | 412.17 |
