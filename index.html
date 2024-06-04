@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Feature Generation Benchmark</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" disabled>
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href=".">Feature Generation Benchmark</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="." class="nav-link active" aria-current="page">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="benchmark_results/" class="nav-link">Results</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="dev_guide/" class="nav-link">Development Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/SemyonSinchenko/feature-generation-benchmark" class="nav-link">GitHub</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" class="nav-link disabled">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="benchmark_results/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                              <button id="theme-menu" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme" class="nav-link dropdown-toggle">
+                                <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                <span class="d-lg-none ms-2">Toggle theme</span>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="fa-solid fa-sun fa-fw"></i>
+                                    <span class="ms-2">Light</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="fa-solid fa-moon fa-fw"></i>
+                                    <span class="ms-2">Dark</span>
+                                    <i class="fa-solid fa-check ms-auto d-none"></i>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                    <span class="ms-2">Auto</span>
+                                    <i class="fa-solid fa-check ms-auto"></i>
+                                  </button>
+                                </li>
+                              </ul>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <script src="js/darkmode.js"></script>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#feature-generation-benchmark" class="nav-link">Feature Generation Benchmark</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#about-the-project" class="nav-link">About the project</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#about-the-task-of-feature-generation" class="nav-link">About the task of Feature Generation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#motivation" class="nav-link">Motivation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#description-of-the-testing-data" class="nav-link">Description of the testing data</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#description-of-the-feature-generation-task" class="nav-link">Description of the Feature Generation task</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#dummy-implementation-in-pandas-as-an-example" class="nav-link">Dummy implementation in Pandas as an example</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="feature-generation-benchmark">Feature Generation Benchmark</h1>
+<h2 id="about-the-project">About the project</h2>
+<p>This project aims to create a DB-like benchmark of feature generation (or feature aggregation) task. Especially the task of generating ML-features from time-series data. In other words it is a benchmark of ETL tools on the task of generating the single partition of the Feature Store.</p>
+<h2 id="about-the-task-of-feature-generation">About the task of Feature Generation</h2>
+<p>Today, in the era of ML-driver approach to the business, each company on the market is trying to use the data about it's customers. For modern banks such a data is, for example, a history of transactions. In a mobile game it may be, for example, the history of in-game purchases. For an online shop it may be, for example, the history of orders.</p>
+<p>The typical ML-task on such a data may be, for example:</p>
+<ul>
+<li>predict the next best offer of the product per customer;</li>
+<li>predict the expected life-time-value of the customer;</li>
+<li>predict the customers attrition;</li>
+</ul>
+<p>And a lot of other interesting and useful for the business tasks. For a good overview you may check the book <a href="https://www.algorithmicmarketingbook.com/">Introduction to Algorithmic Marketing</a>.</p>
+<h3 id="features-from-time-series-data">Features from Time Series data</h3>
+<p>When we have time-series data, but need to make a prediction on the level of the primary key (customer ID, for example), we need to generate features first. A very common approach is just to compute different aggregations, like min, max, average, count, etc. But not on the level of the whole data, but on the level of different groupings and time windows. For example, we may want to calculate something like average customer spending in category "Health" from a Debit Card for the last three months.</p>
+<p>In a result the transforms to an ETL (Extract-Transform-Load) pipeline with a very specific profile, when we have a very long table with about 5 columns and we need to transform it to the short, but very wide table with about thousand of columns. Another problem is that such a pipeline is very hard to explain in pure SQL.</p>
+<h3 id="the-feature-store-approach">The Feature Store approach</h3>
+<p>Because generating thousand of features may be a complex task, it is a common way to create a table with precomputed features. That table is typically named "Feature Store".</p>
+<p>Such a table typically has a structure with two primary keys:</p>
+<ul>
+<li>ID of customer;</li>
+<li>Timestamp mark of the data for which features are up to date);</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>customer_id</th>
+<th>features_timestamp</th>
+<th>feature1</th>
+<th>...</th>
+<th>featureN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id1</td>
+<td>2024-05-12</td>
+<td>1</td>
+<td>...</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>id1</td>
+<td>2024-05-13</td>
+<td>3</td>
+<td>...</td>
+<td>500</td>
+</tr>
+<tr>
+<td>id2</td>
+<td>2024-05-12</td>
+<td>-1</td>
+<td>...</td>
+<td>750</td>
+</tr>
+</tbody>
+</table>
+<p>Where <code>feature1, ..., featureN</code> are aggregations per customer for different categories and for different time windows.</p>
+<h2 id="motivation">Motivation</h2>
+<p>There is a well know <a href="https://www.tpc.org/tpch/">TPC-H bechmark</a> on which the most of ETL-tools are compete. The problem of that benchmark is that it is about DWH-like workload that is slightly different from ML-like Feature Generation workload.</p>
+<p>My benchmark is specified by the following:</p>
+<ol>
+<li>Synthetic data that simulates transactions of bank customers;</li>
+<li>Fully reproducible data: generation is SEED based;</li>
+<li>CLI for generating data of different sizes, starting from small and finishing with a quite big dataset;</li>
+<li>Skew in keys that simulates real-life cases: there are always customers who make much more transactions per day; or categories that are much popular than other;</li>
+<li>Generated data is partitioned by an offset (depends of the size it may be daily partitions, monthly partitions, etc.);</li>
+<li>Generated data is already in columnar data format (<a href="https://parquet.apache.org/">Apache Parquet</a>);</li>
+<li>The task is not to call a group by, but to resolve a real-life case that may have different approaches;</li>
+</ol>
+<h3 id="about-h2o-db-like-benchmark">About H2O db-like benchmark</h3>
+<p>There is also a <a href="https://h2oai.github.io/db-benchmark/">DB-like benchmark from H2O</a>. Why my benchmark is different:</p>
+<ul>
+<li>My benchmark is end2end: from reading the data from columnar storage until the writing data back to columnar storage. H2O benchmark is designed for the case when data is already loaded to memory from a CSV file;</li>
+<li>My benchmark is about generating ML-features from the data, not just compute aggregations. H2O benchmark is just about computation of aggregations;</li>
+<li>My benchmark contains skew in keys: there are categories with distributions like 75% / 25%. Also some primary keys (customers id) are much more common than others. it is a simulation of a real life case, not just computation on synthetic data like in H2O benchmark;</li>
+</ul>
+<h2 id="description-of-the-testing-data">Description of the testing data</h2>
+<p>As input we have the long table of customer transactions in the form of:</p>
+<table>
+<thead>
+<tr>
+<th>customer_id</th>
+<th>card_type</th>
+<th>trx_type</th>
+<th>channel</th>
+<th>trx_amnt</th>
+<th>t_minus</th>
+<th>part_col</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>String</td>
+<td>String</td>
+<td>String</td>
+<td>Double</td>
+<td>Long</td>
+<td>String</td>
+</tr>
+</tbody>
+</table>
+<h3 id="schema-description">Schema description</h3>
+<p><strong>customer_id</strong></p>
+<p>Is a unique ID of our customer. Just an incremental Long value, started from zero. Amount of rows per customers depends of expected transactions per day.</p>
+<p><img alt="Rows per customer distribution" src="static/rows_per_key.png" /></p>
+<p><strong>card_type</strong></p>
+<p>Is a category variable that may have values DC (Debit Card) and CC (Credit Card). DC appears with probability 75%:</p>
+<table>
+<thead>
+<tr>
+<th>DC</th>
+<th>CC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12,972,530</td>
+<td>4,326,925</td>
+</tr>
+</tbody>
+</table>
+<p>(Distribution for tiny dataset)</p>
+<p><strong>trx_type</strong></p>
+<p>Is a category variable with 13 unique values. No skew.</p>
+<p><strong>channel</strong></p>
+<p>Is a category variable with 2 unique values (mobile, classic). Mobile appears with probability 75%:</p>
+<table>
+<thead>
+<tr>
+<th>mobile</th>
+<th>classic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12,976,058</td>
+<td>4,323,397</td>
+</tr>
+</tbody>
+</table>
+<p>(Distribution for tiny dataset**</p>
+<p><strong>trx_amnt</strong></p>
+<p>Is a double variable that is used for next aggregations. Uniformly distributed random value from 100 to 10,000.</p>
+<p><strong>t_minus</strong></p>
+<p>Is a Long value that represents the time. It's value is an offset from the reference date.</p>
+<p><strong>part_col</strong></p>
+<p>Partition column. There are two reasons of that variable:</p>
+<ul>
+<li>an ability to generate out-of-core datasets;</li>
+<li>a simulation of actual pipelines when data is almost always partitioned in a <a href="https://athena.guide/articles/hive-style-partitioning">Hive-style</a>.</li>
+</ul>
+<h2 id="description-of-the-feature-generation-task">Description of the Feature Generation task</h2>
+<h3 id="aggregations">Aggregations</h3>
+<p>Our goal is to generate the following aggregations:</p>
+<ul>
+<li>min;</li>
+<li>max;</li>
+<li>avg;</li>
+<li>sum;</li>
+<li>count;</li>
+</ul>
+<p>The aggregations are always computed for <strong>trx_amnt</strong> column.</p>
+<h3 id="groupings">Groupings</h3>
+<p>We should compute aggregations defined above for the following groups:</p>
+<ul>
+<li>all combinations of <strong>card_type</strong> and <strong>trx_type</strong>;</li>
+<li>all combinations of <strong>channel</strong> and <strong>trx_type</strong>;</li>
+</ul>
+<h3 id="time-intervals">Time intervals</h3>
+<p>We should compute all aggregations for all the groups defined above for the following intervals:</p>
+<ul>
+<li>last week (<strong>t_minus</strong> &lt;= 7);</li>
+<li>last two weeks (<strong>t_minus</strong> &lt;= 14);</li>
+<li>last three weeks (<strong>t_minus</strong> &lt;= 21);</li>
+<li>last month (<strong>t_minus</strong> &lt;= 30);</li>
+<li>last three months (<strong>t_minus</strong> &lt;= 90);</li>
+<li>last half of the year (<strong>t_minus</strong> &lt;= 180);</li>
+<li>last year (<strong>t_minus</strong> &lt;= 360);</li>
+<li>last two years (<strong>t_minus</strong> &lt;= 720);</li>
+</ul>
+<h2 id="dummy-implementation-in-pandas-as-an-example">Dummy implementation in Pandas as an example</h2>
+<pre><code class="language-python">import pandas as pd
+
+
+def generate_pivoted_batch(data: pd.DataFrame, t_minus: int, groups: list[str]) -&gt; pd.DataFrame:
+    pre_agg = (
+        data.loc[data[&quot;t_minus&quot;] &lt;= t_minus]
+        .groupby([&quot;customer_id&quot;] + groups, as_index=False)[&quot;trx_amnt&quot;]
+        .agg([&quot;count&quot;, &quot;mean&quot;, &quot;sum&quot;, &quot;min&quot;, &quot;max&quot;])
+    )
+    pivoted = pre_agg.pivot(
+        columns=groups,
+        index=&quot;customer_id&quot;,
+        values=[&quot;count&quot;, &quot;mean&quot;, &quot;sum&quot;, &quot;min&quot;, &quot;max&quot;],
+    )
+    pivoted.columns = [&quot;_&quot;.join(a[1:]) + f&quot;_{t_minus}d_{a[0]}&quot; for a in pivoted.columns.to_flat_index()]
+    return pivoted
+</code></pre>
+<p>Such a function do the following:</p>
+<ul>
+<li>filter data by the <strong>t_minus</strong> to select only rows, related to the category;</li>
+<li>group data by <strong>customer_id</strong> and given grouping columns;</li>
+<li>compute all required aggregations;</li>
+<li>make a pivot to transform <strong>customer_id</strong> to index and grouping categories to new columns;</li>
+<li>rename output columns and make an index flatten;</li>
+</ul>
+<pre><code class="language-python">dfs_list = []
+
+for win in WINDOWS_IN_DAYS:
+    # Iterate over combination card_type + trx_type
+    dfs_list.append(generate_pivoted_batch(data, win, [&quot;card_type&quot;, &quot;trx_type&quot;]))
+
+    # Iterate over combination channel + trx_type
+    dfs_list.append(generate_pivoted_batch(data, win, [&quot;channel&quot;, &quot;trx_type&quot;]))
+
+(
+    reduce(lambda a, b: pd.merge(a, b, left_index=True, right_index=True), dfs_list)
+    .reset_index(drop=False)
+    .to_parquet(&quot;../tmp_out&quot;)
+)
+</code></pre>
+<p>The last step is just to iterate over required time offset, compute batches and finally join all of them together using the fact, that <strong>customer_id</strong> is an index.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.0
+Build Date UTC : 2024-06-04 09:02:18.620087+00:00
+-->
