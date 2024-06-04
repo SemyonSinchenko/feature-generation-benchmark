@@ -6,5 +6,6 @@
     "PySpark pandas-udf": 516.3818678855896,
     "PySpark case-when": 1808.9883704185486,
     "PySpark Comet case-when": 729.7482228279114,
-    "PySpark-4 polars-udf": 356.1914813518524
+    "PySpark-4 polars-udf": 356.1914813518524,
+    "PySpark pivot": 151.59994101524353
 }

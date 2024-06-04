@@ -1,5 +1,7 @@
 # Results of Benchmark
 
+![Results](https://raw.githubusercontent.com/SemyonSinchenko/feature-generation-benchmark/main/docs/static/results_overview.png)
+
 ## Setup
 
 **EC2 m5.4xlarge**
@@ -38,7 +40,9 @@ See `src/lib.rs` for details of the implementation.
 | Polars pivot | 4.54 |
 | DuckDB pivot | 4.10 |
 | DuckDB case-when | 36.59 |
-| PySpark Comet case-when | 96.93 |
+| PySpark Comet case-when | 94.06 |
+| PySpark-4 polars-udf | 53.06 |
+| PySpark pivot | 104.21 |
 
 
 ## Small Dataset
@@ -57,7 +61,9 @@ See `src/lib.rs` for details of the implementation.
 | DuckDB case-when | 304.52 |
 | PySpark pandas-udf | 516.38 |
 | PySpark case-when | 1808.99 |
-| PySpark Comet case-when | 651.84 |
+| PySpark Comet case-when | 729.75 |
+| PySpark-4 polars-udf | 356.19 |
+| PySpark pivot | 151.60 |
 
 
 
@@ -76,4 +82,6 @@ See `src/lib.rs` for details of the implementation.
 | DuckDB pivot | 2181.59 |
 | PySpark pandas-udf | 5983.14 |
 | PySpark case-when | 17653.46 |
-| PySpark Comet case-when | 4635.37 |
+| PySpark Comet case-when | 4873.54 |
+| PySpark-4 polars-udf | 4704.73 |
+| PySpark pivot | 455.49 |
