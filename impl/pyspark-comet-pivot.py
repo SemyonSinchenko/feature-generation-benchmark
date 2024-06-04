@@ -167,6 +167,8 @@ if __name__ == "__main__":
         SparkSession.builder.master("local[*]")
         .config("spark.driver.memory", "55g")
         .config("spark.executor.memory", "55g")
+        .config("spark.driver.memoryOverheadFactor", "0.5")
+        .config("spark.executor.memoryOverheadFactor", "0.5")
         .config("spark.sql.shuffle.partitions", f"{available_cores}")
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .config("spark.ui.showConsoleProgress", "false")
