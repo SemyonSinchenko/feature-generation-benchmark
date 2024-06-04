@@ -7,5 +7,6 @@
     "DuckDB case-when": 36.58749794960022,
     "PySpark Comet case-when": 94.0553047657013,
     "PySpark-4 polars-udf": 53.060457944869995,
-    "PySpark pivot": 104.20818734169006
+    "PySpark pivot": 104.20818734169006,
+    "PySpark Comet pivot": 106.69124364852905
 }
