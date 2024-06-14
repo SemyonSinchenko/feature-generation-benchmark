@@ -43,10 +43,21 @@ WINDOWS_IN_DAYS = (
 NAME = "Polars pivot"
 
 
-def generate_pivoted_batch(data: pl.DataFrame, t_minus: int, groups: list[str]) -> pl.DataFrame:
+def generate_pivoted_batch(data: pl.DataFrame, groups: list[str]) -> pl.DataFrame:
     pivoted = (
-        data.filter(pl.col("t_minus") <= t_minus)
-        .group_by(["customer_id"] + groups)
+        data
+        .with_columns(
+            pl.when(pl.col("t_minus") <= 7).then(7)
+            .when(pl.col("t_minus") <= 14).then(14)
+            .when(pl.col("t_minus") <= 21).then(21)
+            .when(pl.col("t_minus") <= 30).then(30)
+            .when(pl.col("t_minus") <= 90).then(90)
+            .when(pl.col("t_minus") <= 180).then(180)
+            .when(pl.col("t_minus") <= 360).then(360)
+            .when(pl.col("t_minus") <= 720).then(720)
+            .alias("t_minus")
+        )
+        .group_by(["customer_id", "t_minus"] + groups)
         .agg(
             [
                 pl.count("trx_amnt").alias("count"),
@@ -56,7 +67,7 @@ def generate_pivoted_batch(data: pl.DataFrame, t_minus: int, groups: list[str]) 
                 pl.max("trx_amnt").alias("max"),
             ]
         )
-        .pivot(index="customer_id", columns=groups, values=["count", "mean", "sum", "min", "max"])
+        .pivot(index="customer_id", columns=groups + ["t_minus"], values=["count", "mean", "sum", "min", "max"])
     )
 
     # Polars make some nasty looking column names when pivoting.
@@ -64,8 +75,7 @@ def generate_pivoted_batch(data: pl.DataFrame, t_minus: int, groups: list[str]) 
         {
             column: (
                 column.split("_")[-1].replace("{", "").replace("}", "").replace('"', "").replace(",", "_")
-                + f"_{t_minus}d_"
-                + column.split("_")[0]
+                + "_" + column.split("_")[0]
             )
             for column in pivoted.columns
             if column != "customer_id"
@@ -108,12 +118,9 @@ if __name__ == "__main__":
 
     dfs_list: list[pl.DataFrame] = []
 
-    for win in WINDOWS_IN_DAYS:
-        # Iterate over combination card_type + trx_type
-        dfs_list.append(generate_pivoted_batch(data, win, ["card_type", "trx_type"]))
+    dfs_list.append(generate_pivoted_batch(data, ["card_type", "trx_type"]))
 
-        # Iterate over combination channel + trx_type
-        dfs_list.append(generate_pivoted_batch(data, win, ["channel", "trx_type"]))
+    dfs_list.append(generate_pivoted_batch(data, ["channel", "trx_type"]))
 
     (pl.concat(dfs_list, how="align").write_parquet("../tmp_out"))
 
