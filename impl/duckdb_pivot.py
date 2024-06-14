@@ -79,13 +79,16 @@ if __name__ == "__main__":
                 read_parquet("./{path}/**/*.parquet")
             ),
         all_windows as (
-            {
-                " union all ".join(
-                    [
-                        f"select *, '{win}' as t_minus from base_table where t_minus <= {win}" for win in WINDOWS_IN_DAYS
-                    ]
-                )
-            }
+            select 
+                *,
+                case 
+                    {
+                        " ".join([
+                            f" when t_minus <= {win} then {win} " for win in WINDOWS_IN_DAYS
+                        ])
+                    }
+                end as t_minus_1
+            from base_table
         ),
         card_type_agg as (
             pivot all_windows
@@ -112,7 +115,7 @@ if __name__ == "__main__":
         copy (
             {sql}
         ) to '../tmp_out'
-        (format 'parquet', compression 'zstd');
+        (format 'parquet', compression 'snappy');
     """
     # Start the work
     helper.before()
