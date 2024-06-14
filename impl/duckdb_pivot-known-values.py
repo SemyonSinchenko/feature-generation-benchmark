@@ -40,7 +40,7 @@ WINDOWS_IN_DAYS = (
 
 
 # Information for result
-NAME = "DuckDB pivot"
+NAME = "DuckDB pivot known values"
 
 
 if __name__ == "__main__":
@@ -71,6 +71,11 @@ if __name__ == "__main__":
     #  5   t_minus      int64
     #  6   part_col     category
 
+    card_type_values = "','".join(CARD_TYPES)
+    trx_type_values = "','".join(TRANSACTION_TYPES)
+    channel_values = "','".join(CHANNELS)
+    win_values = ",".join(str(win) for win in WINDOWS_IN_DAYS)
+
     sql = f"""
         with base_table as (
             select
@@ -92,13 +97,19 @@ if __name__ == "__main__":
         ),
         card_type_agg as (
             pivot all_windows
-            on card_type, trx_type, t_minus_1
+            on 
+                card_type in ('{card_type_values}'),
+                trx_type in ('{trx_type_values}'),
+                t_minus_1 in ({win_values})
             using count(trx_amnt) as 'd_count', mean(trx_amnt) as 'd_mean', sum(trx_amnt) as 'd_sum', min(trx_amnt) as 'd_min', max(trx_amnt) as 'd_max'
             group by customer_id
         ),
         channel_type_agg as ( 
             pivot all_windows
-            on channel, trx_type, t_minus_1
+            on 
+                channel in ('{channel_values}'),
+                trx_type in ('{trx_type_values}'),
+                t_minus_1 in ({win_values})
             using count(trx_amnt) as 'd_count', mean(trx_amnt) as 'd_mean', sum(trx_amnt) as 'd_sum', min(trx_amnt) as 'd_min', max(trx_amnt) as 'd_max'
             group by customer_id 
         )
@@ -115,7 +126,7 @@ if __name__ == "__main__":
         copy (
             {sql}
         ) to '../tmp_out'
-        (format 'parquet', compression 'snappy');
+        (format 'parquet', compression 'zstd');
     """
     # Start the work
     helper.before()
