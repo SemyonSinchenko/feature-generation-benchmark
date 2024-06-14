@@ -40,7 +40,7 @@ WINDOWS_IN_DAYS = (
 
 
 # Information for result
-NAME = "DuckDB pivot"
+NAME = "DuckDB pivot known values"
 
 
 if __name__ == "__main__":
