@@ -40,7 +40,7 @@ WINDOWS_IN_DAYS = (
 
 
 # Information for result
-NAME = "Polars pivot"
+NAME = "Polars pivot lazy"
 
 
 def generate_pivoted_batch(data: pl.LazyFrame, groups: list[str]) -> pl.LazyFrame:
