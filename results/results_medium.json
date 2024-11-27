@@ -1,11 +1,6 @@
 {
-    "Pandas pivot": -1,
-    "Polars pivot": -1,
-    "DuckDB pivot": 2181.5874252319336,
-    "PySpark pandas-udf": 5983.137866973877,
-    "PySpark case-when": 17653.461864709854,
-    "PySpark Comet case-when": 4873.537589073181,
-    "PySpark-4 polars-udf": 4704.727216005325,
-    "PySpark pivot": 455.48546409606934,
-    "PySpark Comet pivot": 412.1713216304779
+  "DuckDB pivot": 153.56894493103027,
+  "PySpark pivot": 331.3984570503235,
+  "PySpark Comet pivot": 250.47486519813538,
+  "DuckDB pivot known values": 95.07426047325134
 }

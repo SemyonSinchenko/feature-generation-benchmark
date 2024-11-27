@@ -34,16 +34,12 @@ See `src/lib.rs` for details of the implementation.
 
 | Tool | Time of processing in seconds |
 | ---- | ----------------------------- |
-| PySpark pandas-udf | 78.31 |
-| PySpark case-when | 242.84 |
-| Pandas pivot | 23.91 |
-| Polars pivot | 4.54 |
-| DuckDB pivot | 4.10 |
-| DuckDB case-when | 36.59 |
-| PySpark Comet case-when | 94.06 |
-| PySpark-4 polars-udf | 53.06 |
-| PySpark pivot | 104.21 |
-| PySpark Comet pivot | 106.69 |
+| Pandas pivot | 26.55 |
+| DuckDB pivot | 1.10 |
+| PySpark pivot | 36.14 |
+| PySpark Comet pivot | 32.80 |
+| DuckDB pivot known values | 0.81 |
+| Polars pivot lazy | 3.68 |
 
 
 ## Small Dataset
@@ -56,16 +52,12 @@ See `src/lib.rs` for details of the implementation.
 
 | Tool | Time of processing in seconds |
 | ---- | ----------------------------- |
-| Pandas pivot | 214.67 |
-| Polars pivot | 41.20 |
-| DuckDB pivot | 28.60 |
-| DuckDB case-when | 304.52 |
-| PySpark pandas-udf | 516.38 |
-| PySpark case-when | 1808.99 |
-| PySpark Comet case-when | 729.75 |
-| PySpark-4 polars-udf | 356.19 |
-| PySpark pivot | 151.60 |
-| PySpark Comet pivot | 131.29 |
+| Pandas pivot | 233.18 |
+| DuckDB pivot | 9.87 |
+| PySpark pivot | 62.25 |
+| PySpark Comet pivot | 52.20 |
+| Polars pivot lazy | 35.06 |
+| DuckDB pivot known values | 6.03 |
 
 
 
@@ -79,12 +71,7 @@ See `src/lib.rs` for details of the implementation.
 
 | Tool | Time of processing in seconds |
 | ---- | ----------------------------- |
-| Pandas pivot | OOM |
-| Polars pivot | OOM |
-| DuckDB pivot | 2181.59 |
-| PySpark pandas-udf | 5983.14 |
-| PySpark case-when | 17653.46 |
-| PySpark Comet case-when | 4873.54 |
-| PySpark-4 polars-udf | 4704.73 |
-| PySpark pivot | 455.49 |
-| PySpark Comet pivot | 412.17 |
+| DuckDB pivot | 153.57 |
+| PySpark pivot | 331.40 |
+| PySpark Comet pivot | 250.47 |
+| DuckDB pivot known values | 95.07 |
